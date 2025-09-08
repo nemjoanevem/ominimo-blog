@@ -4,38 +4,36 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rules\Password;
 
 class RegisteredUserController extends Controller
 {
     /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * API register: creates user and returns a Sanctum token and user.
      */
-    public function store(Request $request): Response
+    public function store(Request $request)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        $data = $request->validate([
+            'name'                  => ['required', 'string', 'max:255'],
+            'email'                 => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password'              => ['required', 'confirmed', Password::min(8)],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->string('password')),
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            // Model cast 'hashed' also works, but being explicit is fine for clarity here:
+            'password' => Hash::make($data['password']),
+            // 'role' not mass-assignable on purpose; DB default is 'user'
         ]);
 
-        event(new Registered($user));
+        $token = $user->createToken('api')->plainTextToken;
 
-        Auth::login($user);
-
-        return response()->noContent();
+        return response()->json([
+            'token' => $token,
+            'user'  => $user,
+        ], 201);
     }
 }

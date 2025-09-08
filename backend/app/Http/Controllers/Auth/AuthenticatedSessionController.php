@@ -3,36 +3,50 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Response;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Handle an incoming authentication request.
+     * API login: validates credentials and returns a Sanctum token and user.
      */
-    public function store(LoginRequest $request): Response
+public function store(Request $request)
     {
-        $request->authenticate();
+        $credentials = $request->validate([
+            'email'    => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-        $request->session()->regenerate();
+        $user = User::where('email', $credentials['email'])->first();
 
-        return response()->noContent();
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
+        // OPTIONAL: revoke previous tokens for this user to keep a single active token
+        $user->tokens()->delete();
+
+        $token = $user->createToken('api')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user'  => $user,
+        ]);
     }
 
     /**
-     * Destroy an authenticated session.
+     * API logout: revokes the current access token.
      */
-    public function destroy(Request $request): Response
+    public function destroy(Request $request)
     {
-        Auth::guard('web')->logout();
-
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
+        $request->user()?->currentAccessToken()?->delete();
         return response()->noContent();
     }
 }
