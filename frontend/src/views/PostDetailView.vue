@@ -4,19 +4,19 @@
 
     <main class="max-w-4xl mx-auto p-4">
       <div class="flex items-center justify-between mb-4">
-        <button class="px-3 py-2 rounded-xl border" @click="router.push({ name: 'PostList' })">← Back</button>
+        <button class="px-3 py-2 rounded-xl border" @click="goBack">← Back</button>
 
         <div v-if="auth.isAuthenticated && canEdit" class="flex gap-2">
-          <router-link :to="{ name: 'PostEdit', params: { id } }" class="px-3 py-2 rounded-xl border">
+          <router-link :to="{ name: 'PostEdit', params: { id }, query: route.query }"
+            class="px-3 py-2 rounded-xl border">
             {{ $t('posts.edit') }}
           </router-link>
-          <button class="px-3 py-2 rounded-xl border" @click="onDelete">
+          <button class="px-3 py-2 rounded-xl border" @click="confirmOpen = true">
             {{ $t('posts.delete') }}
           </button>
         </div>
       </div>
 
-      <!-- Post HTML (from cache or server) -->
       <div v-if="html" v-html="html" class="mb-8"></div>
       <div v-else class="opacity-60">{{ $t('common.loading') }}</div>
 
@@ -53,6 +53,18 @@
         </div>
       </section>
     </main>
+
+    <!-- confirm modal -->
+    <ConfirmModal
+      :open="confirmOpen"
+      :title="$t('posts.delete')"
+      :message="$t('posts.confirmDelete')"
+      :confirmText="$t('common.save')"
+      :cancelText="$t('common.cancel')"
+      @cancel="confirmOpen=false"
+      @confirm="onConfirmDelete"
+    />
+
   </div>
 </template>
 
@@ -63,7 +75,8 @@ import { deletePost, getPost, type Post } from '../services/posts'
 import { addComment, deleteComment, getComments, type Comment } from '../services/comments'
 import { useAuthStore } from '../stores/auth'
 import { loadPostHtml, loadPostSnapshot, savePostCache, buildPostHtml } from '../lib/postCache'
-import NavBar from '../components/Navbar.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
+import NavBar from '../components/NavBar.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -76,11 +89,23 @@ const comments = ref<Comment[]>([])
 const page = ref(1)
 const lastPage = ref(1)
 const newComment = ref('')
+const confirmOpen = ref(false)
 
 const canEdit = computed(() => {
   if (!auth.user || !post.value) return false
   return auth.user.role === 'admin' || auth.user.id === post.value.user_id
 })
+
+function goBack() {
+  // preserve ?page from route.query (3. pont)
+  router.push({ name: 'PostList', query: { page: route.query.page ?? 1 } })
+}
+
+async function onConfirmDelete() {
+  confirmOpen.value = false
+  await deletePost(id)
+  router.push({ name: 'PostList' })
+}
 
 async function load() {
   // 1) Try cached snapshot + html
@@ -101,12 +126,6 @@ async function load() {
   html.value = buildPostHtml(post.value as any)
   savePostCache(post.value as any)
   await loadComments()
-}
-
-function escapeHtml(s: string) {
-  const div = document.createElement('div')
-  div.innerText = s
-  return div.innerHTML
 }
 
 async function loadComments() {
