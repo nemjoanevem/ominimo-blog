@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
-const HomeView = () => import('../views/HomeView.vue')
-const LoginView = () => import('../views/LoginView.vue')
+const HomeView = () => import('@/views/HomeView.vue')
+const LoginView = () => import('@/views/LoginView.vue')
 
 /** Routes with basic meta flags. */
 const routes: RouteRecordRaw[] = [

@@ -1,0 +1,28 @@
+{
+  "app": {
+    "title": "Blog App"
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Register",
+    "forgot": "Forgot password?",
+    "email": "Email address",
+    "name": "Full name",
+    "password": "Password",
+    "passwordConfirm": "Confirm password",
+    "noAccount": "Don't have an account?",
+    "sendReset": "Send reset link",
+    "signOut": "Sign out",
+    "successLogin": "You are now signed in.",
+    "successRegister": "Registration successful. You are now signed in.",
+    "successReset": "If your email exists, a reset link has been sent.",
+    "errors": {
+      "required": "This field is required.",
+      "email": "Please enter a valid email address.",
+      "passwordMin": "Password must be at least 8 characters."
+    }
+  },
+  "home": {
+    "title": "Home"
+  }
+}
