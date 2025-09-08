@@ -24,5 +24,47 @@
   },
   "home": {
     "title": "Home"
+  },
+  "posts": {
+    "title": "Posts",
+    "new": "New Post",
+    "edit": "Edit Post",
+    "create": "Create Post",
+    "update": "Update Post",
+    "delete": "Delete",
+    "confirmDelete": "Are you sure you want to delete this post?",
+    "noPosts": "No posts yet.",
+    "form": {
+      "title": "Title",
+      "slug": "Slug (optional)",
+      "body": "Content",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "created": "Post created.",
+      "updated": "Post updated.",
+      "deleted": "Post deleted."
+    }
+  },
+  "comments": {
+    "title": "Comments",
+    "add": "Add Comment",
+    "placeholder": "Write a comment...",
+    "delete": "Delete",
+    "noComments": "No comments yet.",
+    "messages": {
+      "added": "Comment added.",
+      "deleted": "Comment deleted."
+    }
+  },
+  "nav": {
+    "logout": "Sign out",
+    "login": "Sign in"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading..."
   }
 }

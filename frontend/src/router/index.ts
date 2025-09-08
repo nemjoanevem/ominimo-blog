@@ -2,18 +2,22 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
-const HomeView = () => import('@/views/HomeView.vue')
 const LoginView = () => import('@/views/LoginView.vue')
+const PostListView = () => import('@/views/PostListView.vue')
+const PostDetailView = () => import('@/views/PostDetailView.vue')
+const PostFormView = () => import('@/views/PostFormView.vue')
 
 /** Routes with basic meta flags. */
 const routes: RouteRecordRaw[] = [
   { path: '/', redirect: '/redirect' },
-
   { path: '/redirect', name: 'Redirect', component: { template: '<div />' }, meta: { public: true } },
-
   { path: '/login', name: 'Login', component: LoginView, meta: { public: true } },
 
-  { path: '/home', name: 'Home', component: HomeView, meta: { requiresAuth: true } },
+  // Posts
+  { path: '/posts', name: 'PostList', component: PostListView, meta: { public: true } },
+  { path: '/posts/new', name: 'PostCreate', component: PostFormView, meta: { requiresAuth: true } },
+  { path: '/posts/:id', name: 'PostDetail', component: PostDetailView, meta: { public: true } },
+  { path: '/posts/:id/edit', name: 'PostEdit', component: PostFormView, meta: { requiresAuth: true } },
 
   { path: '/:pathMatch(.*)*', redirect: '/login' }
 ]
@@ -23,7 +27,7 @@ export const router = createRouter({
   routes
 })
 
-/** Global navigation guard to place user on login or home appropriately. */
+/** Global navigation guard to place user on login or home(PostList) appropriately. */
 router.beforeEach(async (to, from) => {
   const auth = useAuthStore()
 
@@ -34,7 +38,7 @@ router.beforeEach(async (to, from) => {
 
   // Special redirect route evaluates auth state
   if (to.name === 'Redirect') {
-    return auth.isAuthenticated ? { name: 'Home' } : { name: 'Login' }
+    return auth.isAuthenticated ? { name: 'PostList' } : { name: 'Login' }
   }
 
   // Auth-guard
@@ -44,7 +48,7 @@ router.beforeEach(async (to, from) => {
 
   // If already signed in, avoid going back to login
   if (to.name === 'Login' && auth.isAuthenticated) {
-    return { name: 'Home' }
+    return { name: 'PostList' }
   }
 
   return true

@@ -111,13 +111,13 @@ const router = useRouter()
 /** Handle login submit. */
 const onLogin = async () => {
   await auth.login(login.value)
-  await router.push({ name: 'Home' })
+  await router.push({ name: 'PostList' })
 }
 
 /** Handle registration submit. */
 const onRegister = async () => {
   await auth.register(register.value)
-  await router.push({ name: 'Home' })
+  await router.push({ name: 'PostList' })
 }
 
 /** Handle forgot password submit. */
