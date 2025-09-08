@@ -19,7 +19,8 @@ export const useAuthStore = defineStore('auth', {
     token: (localStorage.getItem(TOKEN_KEY) || '') as string,
     user: null as User | null,
     loading: false as boolean,
-    error: '' as string
+    error: '' as string,
+    notice: '' as string,
   }),
 
   getters: {
@@ -90,12 +91,14 @@ export const useAuthStore = defineStore('auth', {
     async forgot(email: string) {
       this.loading = true
       this.error = ''
+      this.notice = ''
       try {
-        // Breeze API endpoint for password reset request
-        await api.post('/api/forgot-password', { email })
+        // request
+        const { data } = await api.post('/api/forgot-password', { email })
+        const msg = data?.message ?? data?.status ?? ''
+        this.notice = msg || ''
       } catch (e: any) {
-        this.error = e?.response?.data?.message ?? 'Request failed.'
-        // Do not rethrow; UX: we still show generic success to avoid information leakage
+        this.error = e?.response?.data?.message ?? e?.response?.data?.errors?.email?.[0] ?? 'Request failed.'
       } finally {
         this.loading = false
       }
@@ -113,6 +116,10 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem(TOKEN_KEY)
         setAuthToken(undefined)
       }
+    },
+    clearFlash() {
+      this.error = ''
+      this.notice = ''
     }
   }
 })

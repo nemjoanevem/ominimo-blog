@@ -7,10 +7,10 @@
       <div class="flex gap-2 mb-6">
         <button class="flex-1 py-2 rounded-xl border"
                 :class="tab==='login' ? 'bg-gray-900 text-white' : 'bg-white'"
-                @click="tab='login'">{{ $t('auth.login') }}</button>
+                @click="switchTab('login')">{{ $t('auth.login') }}</button>
         <button class="flex-1 py-2 rounded-xl border"
                 :class="tab==='register' ? 'bg-gray-900 text-white' : 'bg-white'"
-                @click="tab='register'">{{ $t('auth.register') }}</button>
+                @click="switchTab('register')">{{ $t('auth.register') }}</button>
       </div>
 
       <!-- Login -->
@@ -33,8 +33,8 @@
         </button>
 
         <div class="text-sm text-gray-600 flex justify-between mt-2">
-          <button type="button" class="underline" @click="tab='register'">{{ $t('auth.noAccount') }}</button>
-          <button type="button" class="underline" @click="tab='forgot'">{{ $t('auth.forgot') }}</button>
+          <button type="button" class="underline" @click="switchTab('register')">{{ $t('auth.noAccount') }}</button>
+          <button type="button" class="underline" @click="switchTab('forgot')">{{ $t('auth.forgot') }}</button>
         </div>
 
         <p v-if="auth.error" class="text-sm text-red-600">{{ auth.error }}</p>
@@ -77,7 +77,7 @@
         <div>
           <label class="block text-sm mb-1">{{ $t('auth.email') }}</label>
           <input v-model="forgotEmail" type="email" required
-                 class="w-full border rounded-xl px-4 py-2 outline-none focus:ring" />
+                class="w-full border rounded-xl px-4 py-2 outline-none focus:ring" />
         </div>
 
         <button type="submit"
@@ -86,6 +86,9 @@
           {{ $t('auth.sendReset') }}
         </button>
 
+        <!-- success -->
+        <p v-if="auth.notice" class="text-sm text-green-600">{{ auth.notice }}</p>
+        <!-- error -->
         <p v-if="auth.error" class="text-sm text-red-600">{{ auth.error }}</p>
       </form>
     </div>
@@ -124,6 +127,11 @@ const onRegister = async () => {
 const onForgot = async () => {
   await auth.forgot(forgotEmail.value)
   // UX: we keep the user on the tab; backend email config may be missing in dev
+}
+
+const switchTab = (t: 'login'|'register'|'forgot') => {
+  tab.value = t
+  auth.clearFlash() // reset success/error when switching tabs
 }
 </script>
 
