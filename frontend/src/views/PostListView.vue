@@ -19,15 +19,32 @@
         </div>
 
         <ul class="space-y-3">
-          <li v-for="p in posts" :key="p.id" class="border rounded-xl p-4">
-            <router-link
-              :to="{ name: 'PostDetail', params: { id: p.id }, query: { page } }"
-              class="font-medium hover:underline"
-              @click="cachePost(p)"
-            >
-              {{ p.title }}
-            </router-link>
-            <p class="text-sm opacity-70 mt-1">{{ p.user?.name }}</p>
+          <li
+            v-for="p in posts"
+            :key="p.id"
+            class="border rounded-xl p-4 transition-colors"
+            :class="auth.user && auth.user.id === p.user_id ? 'bg-gray-50' : 'bg-white'"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <router-link
+                :to="{ name: 'PostDetail', params: { id: p.id }, query: { page } }"
+                class="font-medium hover:underline"
+                @click="cachePost(p)"
+              >
+                {{ p.title }}
+              </router-link>
+
+              <span
+                v-if="auth.user && auth.user.id === p.user_id"
+                class="text-xs px-2 py-0.5 rounded-full border bg-white"
+              >
+                {{ $t('posts.yours') }}
+              </span>
+            </div>
+
+            <p class="text-sm opacity-70 mt-1">
+              {{ p.user?.name }}
+            </p>
             <p class="text-sm mt-2 opacity-80">{{ p.description }}</p>
           </li>
         </ul>

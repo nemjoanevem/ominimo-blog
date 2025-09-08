@@ -4,12 +4,24 @@
       <router-link to="/home" class="font-semibold">Blog</router-link>
 
       <div class="flex items-center gap-3">
-        <router-link v-if="!auth.isAuthenticated" to="/login"
-          class="px-3 py-1 rounded-lg border">
+        <!-- Welcome text for authenticated users -->
+        <span v-if="auth.isAuthenticated" class="text-sm opacity-80">
+          {{ $t('nav.welcome', { name: displayName }) }}
+        </span>
+
+        <router-link
+          v-if="!auth.isAuthenticated"
+          to="/login"
+          class="px-3 py-1 rounded-lg border"
+        >
           {{ $t('nav.login') }}
         </router-link>
-        <button v-else @click="onLogout"
-          class="px-3 py-1 rounded-lg border">
+
+        <button
+          v-else
+          @click="onLogout"
+          class="px-3 py-1 rounded-lg border"
+        >
           {{ $t('nav.logout') }}
         </button>
       </div>
@@ -18,13 +30,18 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const auth = useAuthStore()
 
+// Prefer a friendly display name; fallback to email if needed
+const displayName = computed(() => auth.user?.name || auth.user?.email || 'User')
+
 const onLogout = async () => {
+  // Log out and redirect to Login
   await auth.logout()
   router.push({ name: 'Login' })
 }
