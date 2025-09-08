@@ -62,6 +62,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { deletePost, getPost, type Post } from '../services/posts'
 import { addComment, deleteComment, getComments, type Comment } from '../services/comments'
 import { useAuthStore } from '../stores/auth'
+import { loadPostHtml, loadPostSnapshot, savePostCache, buildPostHtml } from '../lib/postCache'
 import NavBar from '../components/Navbar.vue'
 
 const auth = useAuthStore()
@@ -82,32 +83,24 @@ const canEdit = computed(() => {
 })
 
 async function load() {
-  // 1) Try cache
-  const cached = sessionStorage.getItem(`post:html:${id}`)
-  if (cached) {
-    html.value = cached
-  }
-
-  // 2) We still need minimal data (id/user_id) for edit/delete perms & comments
-  try {
-    const data = await getPost(id)
-    post.value = data
-
-    // If no cache (direct URL), construct HTML now
-    if (!cached) {
-      html.value = `
-        <article>
-          <h1 class="text-2xl font-semibold">${escapeHtml(data.title)}</h1>
-          <p class="text-sm opacity-70">${escapeHtml(data.user?.name ?? '')}</p>
-          <div class="mt-4 whitespace-pre-wrap">${escapeHtml(data.body)}</div>
-        </article>
-      `
-    }
-
+  // 1) Try cached snapshot + html
+  const snap = loadPostSnapshot(id)
+  const cachedHtml = loadPostHtml(id)
+  if (snap && cachedHtml) {
+    post.value = snap as any
+    html.value = cachedHtml
     await loadComments()
-  } catch {
-    // handle not found
+    return
   }
+
+  // 2) Fallback: fetch, then cache for later transitions
+  const data = await getPost(id)
+  post.value = {
+    id: data.id, user_id: data.user_id, title: data.title, body: data.body, user: data.user
+  } as any
+  html.value = buildPostHtml(post.value as any)
+  savePostCache(post.value as any)
+  await loadComments()
 }
 
 function escapeHtml(s: string) {

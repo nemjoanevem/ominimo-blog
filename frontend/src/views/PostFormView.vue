@@ -47,6 +47,7 @@
 import { onMounted, reactive, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createPost, getPost, updatePost } from '../services/posts'
+import { savePostCache } from '../lib/postCache'
 import NavBar from '../components/Navbar.vue'
 
 const route = useRoute()
@@ -72,9 +73,24 @@ async function onSubmit() {
   try {
     if (isEdit.value) {
       const updated = await updatePost(id.value, { title: form.title, slug: form.slug, body: form.body })
+      // cache refresh before navigate
+      savePostCache({
+        id: updated.id,
+        user_id: updated.user_id,
+        title: updated.title,
+        body: updated.body,
+        user: updated.user
+      })
       router.push({ name: 'PostDetail', params: { id: updated.id } })
     } else {
       const created = await createPost(form)
+      savePostCache({
+        id: created.id,
+        user_id: created.user_id,
+        title: created.title,
+        body: created.body,
+        user: created.user
+      })
       router.push({ name: 'PostDetail', params: { id: created.id } })
     }
   } catch (e: any) {

@@ -23,22 +23,15 @@
             <router-link
               :to="{ name: 'PostDetail', params: { id: p.id } }"
               class="font-medium hover:underline"
-              @click.native="cacheHtml(p.id)">
-              >
+              @click="cachePost(p)"
+            >
               {{ p.title }}
             </router-link>
             <p class="text-sm opacity-70 mt-1">{{ p.user?.name }}</p>
             <p class="text-sm mt-2 opacity-80">{{ p.description }}</p>
-
-            <div :id="`post-html-${p.id}`" class="hidden">
-              <article>
-                <h1 class="text-2xl font-semibold">{{ p.title }}</h1>
-                <p class="text-sm opacity-70">{{ p.user?.name }}</p>
-                  <div class="mt-4 whitespace-pre-wrap">{{ p.body }}</div>
-              </article>
-            </div>
           </li>
         </ul>
+
 
 
         <!-- Pagination -->
@@ -61,6 +54,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getPosts, type Post } from '../services/posts'
 import { useAuthStore } from '../stores/auth'
+import { savePostCache, type PostSnapshot } from '../lib/postCache'
 import NavBar from '../components/Navbar.vue'
 
 const auth = useAuthStore()
@@ -84,11 +78,11 @@ function goto(p: number) {
   router.push({ name: 'PostList', query: { page: p } })
 }
 
-function cacheHtml(id: number) {
-  const el = document.getElementById(`post-html-${id}`)
-  if (el) {
-    sessionStorage.setItem(`post:html:${id}`, el.innerHTML)
+function cachePost(p: any) {
+  const snap: PostSnapshot = {
+    id: p.id, user_id: p.user_id, title: p.title, body: p.body, user: p.user
   }
+  savePostCache(snap)
 }
 
 onMounted(load)
