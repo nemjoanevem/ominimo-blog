@@ -21,7 +21,7 @@
         <ul class="space-y-3">
           <li v-for="p in posts" :key="p.id" class="border rounded-xl p-4">
             <router-link
-              :to="{ name: 'PostDetail', params: { id: p.id } }"
+              :to="{ name: 'PostDetail', params: { id: p.id }, query: { page } }"
               class="font-medium hover:underline"
               @click="cachePost(p)"
             >
@@ -55,7 +55,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { getPosts, type Post } from '../services/posts'
 import { useAuthStore } from '../stores/auth'
 import { savePostCache, type PostSnapshot } from '../lib/postCache'
-import NavBar from '../components/Navbar.vue'
+import { watch } from 'vue'
+import NavBar from '../components/NavBar.vue'
 
 const auth = useAuthStore()
 const route = useRoute()
@@ -80,10 +81,21 @@ function goto(p: number) {
 
 function cachePost(p: any) {
   const snap: PostSnapshot = {
-    id: p.id, user_id: p.user_id, title: p.title, body: p.body, user: p.user
+    id: p.id, user_id: p.user_id, title: p.title, body: p.body, user: p.user, slug: p.slug
   }
   savePostCache(snap)
 }
 
-onMounted(load)
+watch(
+  () => route.query.page,
+  async (val) => {
+    page.value = Number(val ?? 1)
+    await load()
+  }
+)
+
+onMounted(() => {
+  page.value = Number(route.query.page ?? 1)
+  load()
+})
 </script>

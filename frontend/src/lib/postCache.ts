@@ -2,6 +2,7 @@ export type PostSnapshot = {
   id: number
   user_id: number
   title: string
+  slug?: string
   body: string
   user?: { id: number; name: string; email: string }
 }
@@ -29,9 +30,9 @@ export function savePostCache(p: PostSnapshot) {
 
 export function loadPostSnapshot(id: number): PostSnapshot | null {
   const raw = sessionStorage.getItem(`post:snapshot:${id}`)
-  return raw ? JSON.parse(raw) as PostSnapshot : null
+  return raw ? (JSON.parse(raw) as PostSnapshot) : null
 }
 
-export function loadPostHtml(id: number): string | '' {
+export function loadPostHtml(id: number): string {
   return sessionStorage.getItem(`post:html:${id}`) ?? ''
 }

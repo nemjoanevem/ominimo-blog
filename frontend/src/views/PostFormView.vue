@@ -47,8 +47,8 @@
 import { onMounted, reactive, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { createPost, getPost, updatePost } from '../services/posts'
-import { savePostCache } from '../lib/postCache'
-import NavBar from '../components/Navbar.vue'
+import { loadPostSnapshot, savePostCache } from '../lib/postCache'
+import NavBar from '../components/NavBar.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -60,12 +60,20 @@ const form = reactive<{ title: string; slug?: string; body: string }>({ title: '
 const error = ref('')
 
 onMounted(async () => {
-  if (isEdit.value) {
-    const data = await getPost(id.value)
-    form.title = data.title
-    form.slug = data.slug
-    form.body = data.body
+  if (!isEdit.value) return
+  // 1) try cache first
+  const snap = loadPostSnapshot(id.value)
+  if (snap) {
+    form.title = snap.title
+    form.slug  = snap.slug
+    form.body  = snap.body
+    return
   }
+  // 2) fallback to API
+  const data = await getPost(id.value)
+  form.title = data.title
+  form.slug  = data.slug
+  form.body  = data.body
 })
 
 async function onSubmit() {
@@ -73,25 +81,27 @@ async function onSubmit() {
   try {
     if (isEdit.value) {
       const updated = await updatePost(id.value, { title: form.title, slug: form.slug, body: form.body })
-      // cache refresh before navigate
+      // refresh cache (snapshot + html) with latest values
       savePostCache({
         id: updated.id,
         user_id: updated.user_id,
         title: updated.title,
+        slug: updated.slug,
         body: updated.body,
         user: updated.user
       })
-      router.push({ name: 'PostDetail', params: { id: updated.id } })
+      router.push({ name: 'PostDetail', params: { id: updated.id }, query: route.query })
     } else {
       const created = await createPost(form)
       savePostCache({
         id: created.id,
         user_id: created.user_id,
         title: created.title,
+        slug: created.slug,
         body: created.body,
         user: created.user
       })
-      router.push({ name: 'PostDetail', params: { id: created.id } })
+      router.push({ name: 'PostDetail', params: { id: created.id }, query: route.query })
     }
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? 'Save failed.'
