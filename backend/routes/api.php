@@ -16,9 +16,9 @@ Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
 Route::post('/reset-password', [NewPasswordController::class, 'store']);
 
 Route::get('/posts', [PostController::class, 'index']);
-Route::get('/posts/{post}', [PostController::class, 'show']);
+Route::get('/posts/{post}', [PostController::class, 'show'])->whereNumber('post');
 
-Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
+Route::get('/posts/{postId}/comments', [CommentController::class, 'index'])->whereNumber('postId');
 
 // --- Protected endpoints (require Bearer token) ---
 Route::middleware('auth:sanctum')->group(function () {
@@ -31,7 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/posts/{post}', [PostController::class, 'update']);
     Route::delete('/posts/{post}', [PostController::class, 'destroy']);
 
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
+    Route::post('/posts/{postId}/comments', [CommentController::class, 'store'])->whereNumber('postId');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
     
     Route::get('/admin/ping', fn () => ['ok' => true])->middleware('role:admin');
