@@ -25,10 +25,15 @@ class CommentController extends Controller
     /** POST /api/posts/{postId}/comments */
     public function store(CommentStoreRequest $request, int $postId): JsonResponse
     {
-        $this->authorize('create', Comment::class);
-
         $post = Post::findOrFail($postId);
-        $comment = $this->service->create($post, $request->user(), $request->validated()['body']);
+
+        $comment = $this->service->create(
+            $post,
+            $request->user(),
+            $request->validated()['body'],
+            $request->validated()['guest_name'] ?? null,
+            $request->validated()['guest_email'] ?? null
+        );
 
         return response()->json($comment, 201);
     }

@@ -19,6 +19,8 @@ class Comment extends Model
         'user_id',
         'post_id',
         'body',
+        'guest_name',
+        'guest_email',
     ];
 
     // Relationships
