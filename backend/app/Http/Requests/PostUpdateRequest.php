@@ -10,15 +10,26 @@ class PostUpdateRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $this->merge([
-            'title' => $this->filled('title') ? trim((string) $this->input('title')) : null,
-            'slug'  => $this->filled('slug')  ? trim((string) $this->input('slug'))  : null,
-        ]);
+        $data = [];
+
+        if ($this->has('title')) {
+            $data['title'] = trim((string) $this->input('title'));
+        }
+        if ($this->has('slug')) {
+            $data['slug'] = trim((string) $this->input('slug'));
+        }
+        if ($this->has('body')) {
+            $data['body'] = (string) $this->input('body');
+        }
+
+        if ($data) {
+            $this->merge($data);
+        }
     }
 
     public function rules(): array
     {
-        $postId = $this->route('post')?->id; // model bound by slug
+        $postId = $this->route('post')?->id;
         return [
             'title' => ['sometimes','string','max:255'],
             'body'  => ['sometimes','string'],
