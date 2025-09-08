@@ -1,7 +1,8 @@
-<script setup lang="ts"></script>
-
 <template>
   <router-view />
+  <GlobalLoader />
 </template>
 
-<style scoped></style>
+<script setup lang="ts">
+import GlobalLoader from './components/GlobalLoader.vue'
+</script>
