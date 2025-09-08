@@ -16,6 +16,7 @@
     "successLogin": "You are now signed in.",
     "successRegister": "Registration successful. You are now signed in.",
     "successReset": "If your email exists, a reset link has been sent.",
+    "continueAsGuest": "Continue as guest",
     "errors": {
       "required": "This field is required.",
       "email": "Please enter a valid email address.",
@@ -49,10 +50,14 @@
   },
   "comments": {
     "title": "Comments",
-    "add": "Add Comment",
-    "placeholder": "Write a comment...",
-    "delete": "Delete",
     "noComments": "No comments yet.",
+    "delete": "Delete",
+    "add": "Add comment",
+    "placeholder": "Write a comment...",
+    "guest": "Guest",
+    "guestName": "Your name",
+    "guestEmail": "Your email",
+    "guestFieldsRequired": "Name and email are required for guest comments.",
     "messages": {
       "added": "Comment added.",
       "deleted": "Comment deleted."
@@ -60,7 +65,8 @@
   },
   "nav": {
     "logout": "Sign out",
-    "login": "Sign in"
+    "login": "Sign in",
+    "welcome": "Welcome, {name}"
   },
   "common": {
     "save": "Save",

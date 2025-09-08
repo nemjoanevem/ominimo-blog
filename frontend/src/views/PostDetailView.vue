@@ -31,10 +31,17 @@
         <ul class="space-y-3">
           <li v-for="c in comments" :key="c.id" class="border rounded-xl p-3">
             <div class="flex items-center justify-between">
-              <span class="font-medium">{{ c.user?.name }}</span>
-              <button v-if="auth.user && (auth.user.id===c.user_id || auth.user.role==='admin')"
-                      class="text-sm opacity-70 hover:underline"
-                      @click="onDeleteComment(c.id)">
+              <span class="font-medium">{{ c.user?.name ?? c.guest_name ?? $t('comments.guest') }}</span>
+              <button
+                v-if="
+                  auth.user &&
+                  (auth.user.id === c.user_id ||
+                  auth.user.role === 'admin' ||
+                  (post && auth.user.id === post.user_id))
+                "
+                class="text-sm opacity-70 hover:underline"
+                @click="onDeleteComment(c.id)"
+              >
                 {{ $t('comments.delete') }}
               </button>
             </div>
@@ -42,13 +49,24 @@
           </li>
         </ul>
 
-        <div v-if="auth.isAuthenticated" class="mt-4">
-          <form @submit.prevent="onAddComment" class="flex gap-2">
-            <input v-model="newComment" type="text" :placeholder="$t('comments.placeholder') as string"
-                   class="flex-1 border rounded-xl px-4 py-2 outline-none">
-            <button class="px-3 py-2 rounded-xl bg-gray-900 text-white">
-              {{ $t('comments.add') }}
-            </button>
+        <div class="mt-4">
+          <form @submit.prevent="onAddComment" class="space-y-2">
+            <div v-if="!auth.isAuthenticated" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <input v-model="guestName" type="text" :placeholder="$t('comments.guestName') as string"
+                    class="border rounded-xl px-4 py-2 outline-none">
+              <input v-model="guestEmail" type="email" :placeholder="$t('comments.guestEmail') as string"
+                    class="border rounded-xl px-4 py-2 outline-none">
+            </div>
+
+            <div class="flex gap-2">
+              <input v-model="newComment" type="text" :placeholder="$t('comments.placeholder') as string"
+                    class="flex-1 border rounded-xl px-4 py-2 outline-none">
+              <button class="px-3 py-2 rounded-xl bg-gray-900 text-white">
+                {{ $t('comments.add') }}
+              </button>
+            </div>
+
+            <p v-if="commentError" class="text-sm text-red-600">{{ commentError }}</p>
           </form>
         </div>
       </section>
@@ -71,13 +89,14 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { deletePost, getPost, type Post } from '../services/posts'
 import { addComment, deleteComment, getComments, type Comment } from '../services/comments'
 import { useAuthStore } from '../stores/auth'
 import { loadPostHtml, loadPostSnapshot, savePostCache, buildPostHtml } from '../lib/postCache'
 import ConfirmModal from '../components/ConfirmModal.vue'
 import NavBar from '../components/NavBar.vue'
-
+const { t } = useI18n()
 const auth = useAuthStore()
 const route = useRoute()
 const router = useRouter()
@@ -89,6 +108,10 @@ const comments = ref<Comment[]>([])
 const page = ref(1)
 const lastPage = ref(1)
 const newComment = ref('')
+const guestName = ref('')
+const guestEmail = ref('')
+const commentError = ref('')
+
 const confirmOpen = ref(false)
 
 const canEdit = computed(() => {
@@ -136,10 +159,27 @@ async function loadComments() {
 }
 
 async function onAddComment() {
-  if (!post.value || !newComment.value.trim()) return
-  await addComment(post.value.id, newComment.value.trim())
-  newComment.value = ''
-  await loadComments()
+  commentError.value = ''
+  if (!post.value) return
+  try {
+    if (!newComment.value.trim()) return
+
+    if (auth.isAuthenticated) {
+      await addComment(post.value.id, newComment.value.trim())
+    } else {
+      if (!guestName.value.trim() || !guestEmail.value.trim()) {
+        commentError.value = String(t('comments.guestFieldsRequired'))
+        return
+      }
+      await addComment(post.value.id, newComment.value.trim(), { name: guestName.value.trim(), email: guestEmail.value.trim() })
+    }
+
+    newComment.value = ''
+    if (!auth.isAuthenticated) { guestName.value = ''; guestEmail.value = '' }
+    await loadComments()
+  } catch (e: any) {
+    commentError.value = e?.response?.data?.message ?? 'Failed to add comment.'
+  }
 }
 
 async function onDelete() {

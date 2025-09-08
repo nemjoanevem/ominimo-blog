@@ -11,6 +11,8 @@
         <button class="flex-1 py-2 rounded-xl border"
                 :class="tab==='register' ? 'bg-gray-900 text-white' : 'bg-white'"
                 @click="switchTab('register')">{{ $t('auth.register') }}</button>
+        <button class="flex-1 py-2 rounded-xl border"
+          @click="continueAsGuest">{{ $t('auth.continueAsGuest') }}</button>
       </div>
 
       <!-- Login -->
@@ -127,6 +129,12 @@ const onRegister = async () => {
 const onForgot = async () => {
   await auth.forgot(forgotEmail.value)
   // UX: we keep the user on the tab; backend email config may be missing in dev
+}
+
+function continueAsGuest() {
+  // Clear any previous flash and just go to posts without auth
+  auth.clearFlash?.()
+  router.push({ name: 'PostList' })
 }
 
 const switchTab = (t: 'login'|'register'|'forgot') => {

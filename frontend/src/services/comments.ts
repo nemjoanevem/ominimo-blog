@@ -2,9 +2,11 @@ import { api } from './api'
 
 export type Comment = {
   id: number
-  user_id: number
+  user_id: number | null
   post_id: number
   body: string
+  guest_name?: string | null
+  guest_email?: string | null
   user?: { id: number; name: string; email: string }
 }
 
@@ -13,8 +15,13 @@ export async function getComments(postId: number, page = 1, perPage = 10) {
   return data
 }
 
-export async function addComment(postId: number, body: string) {
-  const { data } = await api.post(`/api/posts/${postId}/comments`, { body })
+export async function addComment(postId: number, body: string, guest?: { name: string; email: string }) {
+  const payload: any = { body }
+  if (guest) {
+    payload.guest_name = guest.name
+    payload.guest_email = guest.email
+  }
+  const { data } = await api.post(`/api/posts/${postId}/comments`, payload)
   return data
 }
 
