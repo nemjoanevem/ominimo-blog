@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -11,10 +13,7 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
+    protected $model = User::class;
 
     /**
      * Define the model's default state.
@@ -24,12 +23,26 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            // Note: 'email' MUST be unique to avoid constraint violations
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            // The 'hashed' cast on the model will hash this automatically
+            'password' => 'password',
             'remember_token' => Str::random(10),
+            // Store enum as string; either Role::USER or Role::USER->value works with enum cast
+            'role' => Role::USER->value,
         ];
+    }
+
+    /**
+     * Indicate that the user is an administrator.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn () => [
+            'role' => Role::ADMIN->value,
+        ]);
     }
 
     /**

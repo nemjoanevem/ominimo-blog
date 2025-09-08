@@ -3,9 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Role;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+// use Laravel\Sanctum\HasApiTokens; // TODO: when Breeze API + Sanctum is installed
 
 class User extends Authenticatable
 {
@@ -14,6 +16,8 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
+     *
+     * Note: 'role' is intentionally not fillable for security reasons.
      *
      * @var list<string>
      */
@@ -43,6 +47,24 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => Role::class, // enum cast
         ];
+    }
+
+    // Relationships
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    // Helpers
+    public function isAdmin(): bool
+    {
+        return $this->role === Role::ADMIN;
     }
 }
