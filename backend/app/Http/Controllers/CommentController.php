@@ -27,9 +27,11 @@ class CommentController extends Controller
     {
         $post = Post::findOrFail($postId);
 
+        $user = $request->authUser();
+
         $comment = $this->service->create(
             $post,
-            $request->user(),
+            $user,
             $request->validated()['body'],
             $request->validated()['guest_name'] ?? null,
             $request->validated()['guest_email'] ?? null
