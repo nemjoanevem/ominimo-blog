@@ -7,18 +7,16 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Response;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * API login: validates credentials and returns a Sanctum token and user.
      */
-public function store(Request $request)
+    public function store(Request $request)
     {
         $credentials = $request->validate([
-            'email'    => ['required', 'email'],
+            'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
@@ -37,7 +35,7 @@ public function store(Request $request)
 
         return response()->json([
             'token' => $token,
-            'user'  => $user,
+            'user' => $user,
         ]);
     }
 
@@ -47,6 +45,7 @@ public function store(Request $request)
     public function destroy(Request $request)
     {
         $request->user()?->currentAccessToken()?->delete();
+
         return response()->noContent();
     }
 }

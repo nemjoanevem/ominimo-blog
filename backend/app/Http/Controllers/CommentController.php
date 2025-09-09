@@ -18,7 +18,8 @@ class CommentController extends Controller
     public function index(CommentIndexRequest $request, int $postId): JsonResponse
     {
         $post = Post::findOrFail($postId);
-        $data = $this->service->paginateForPost($post, (int)$request->integer('per_page', 10));
+        $data = $this->service->paginateForPost($post, (int) $request->integer('per_page', 10));
+
         return response()->json($data);
     }
 

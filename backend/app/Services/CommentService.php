@@ -22,10 +22,10 @@ class CommentService
     public function create(Post $post, ?User $user, string $body, ?string $guestName = null, ?string $guestEmail = null): Comment
     {
         return Comment::create([
-            'post_id'     => $post->id,
-            'user_id'     => $user?->id,
-            'body'        => $body,
-            'guest_name'  => $user ? null : $guestName,
+            'post_id' => $post->id,
+            'user_id' => $user?->id,
+            'body' => $body,
+            'guest_name' => $user ? null : $guestName,
             'guest_email' => $user ? null : $guestEmail,
         ])->load('user:id,name,email');
     }

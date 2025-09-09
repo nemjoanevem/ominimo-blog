@@ -19,6 +19,7 @@ class PostService
         $paginator->getCollection()->transform(function (Post $post) {
             // Derive a short description on the fly (used by frontend list + hidden HTML cache)
             $post->description = Str::limit(strip_tags($post->body), 160);
+
             return $post;
         });
 
@@ -38,20 +39,20 @@ class PostService
 
         return Post::create([
             'user_id' => $author->id,
-            'title'   => $data['title'],
-            'slug'    => $slug,
-            'body'    => $data['body'],
+            'title' => $data['title'],
+            'slug' => $slug,
+            'body' => $data['body'],
         ]);
     }
 
     /** Update a post and (optionally) regenerate slug from title if not supplied. */
     public function update(Post $post, array $data): Post
     {
-        if (isset($data['title']) && !isset($data['slug'])) {
+        if (isset($data['title']) && ! isset($data['slug'])) {
             $data['slug'] = $this->makeUniqueSlug($data['title'], $post->id);
         }
 
-        $post->fill(array_filter($data, fn($v) => !is_null($v)));
+        $post->fill(array_filter($data, fn ($v) => ! is_null($v)));
         $post->save();
 
         return $post->fresh('user:id,name,email');
@@ -72,11 +73,11 @@ class PostService
 
         while (
             Post::where('slug', $slug)
-                ->when($ignoreId, fn($q) => $q->where('id','!=',$ignoreId))
+                ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
                 ->exists()
         ) {
             $i++;
-            $slug = $base . '-' . str_pad((string)$i, 2, '0', STR_PAD_LEFT);
+            $slug = $base.'-'.str_pad((string) $i, 2, '0', STR_PAD_LEFT);
             if (strlen($slug) > 255) {
                 $slug = substr($slug, 0, 255);
             }

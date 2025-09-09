@@ -2,10 +2,11 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         DB::statement('ALTER TABLE comments ALTER COLUMN user_id DROP NOT NULL');
@@ -19,7 +20,7 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('comments', function (Blueprint $table) {
-            $table->dropColumn(['guest_name','guest_email']);
+            $table->dropColumn(['guest_name', 'guest_email']);
         });
 
         if (DB::getDriverName() === 'pgsql') {

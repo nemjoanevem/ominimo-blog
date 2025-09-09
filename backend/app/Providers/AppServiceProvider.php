@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Support\ServiceProvider;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Policies\CommentPolicy;
 use App\Policies\PostPolicy;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {

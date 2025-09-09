@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
 
 class RateLimiterServiceProvider extends ServiceProvider
 {
@@ -24,7 +24,8 @@ class RateLimiterServiceProvider extends ServiceProvider
     {
         RateLimiter::for('comments', function (Request $request) {
             $user = $request->user('sanctum');
-            $key  = ($user?->id ?? $request->ip()).'|comments';
+            $key = ($user?->id ?? $request->ip()).'|comments';
+
             return Limit::perMinute(10)->by($key);
         });
 
@@ -34,6 +35,7 @@ class RateLimiterServiceProvider extends ServiceProvider
                 return Limit::none();
             }
             $key = ($user?->id ?? $request->ip()).'|post-writes';
+
             return Limit::perMinute(5)->by($key);
         });
     }

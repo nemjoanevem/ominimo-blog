@@ -6,7 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PostUpdateRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     protected function prepareForValidation(): void
     {
@@ -30,10 +33,11 @@ class PostUpdateRequest extends FormRequest
     public function rules(): array
     {
         $postId = $this->route('post')?->id;
+
         return [
-            'title' => ['sometimes','string','max:255'],
-            'body'  => ['sometimes','string'],
-            'slug'  => ['sometimes','string','max:255','unique:posts,slug,' . $postId],
+            'title' => ['sometimes', 'string', 'max:255'],
+            'body' => ['sometimes', 'string'],
+            'slug' => ['sometimes', 'string', 'max:255', 'unique:posts,slug,'.$postId],
         ];
     }
 

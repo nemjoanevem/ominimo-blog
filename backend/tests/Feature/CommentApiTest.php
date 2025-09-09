@@ -23,9 +23,9 @@ class CommentApiTest extends TestCase
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id','user_id','post_id','body','user' => ['id','name','email']],
+                    '*' => ['id', 'user_id', 'post_id', 'body', 'user' => ['id', 'name', 'email']],
                 ],
-                'current_page','last_page','per_page','total'
+                'current_page', 'last_page', 'per_page', 'total',
             ])
             ->assertJsonCount(3, 'data');
     }

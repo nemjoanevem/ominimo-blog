@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Enums\Role;
 use App\Models\Comment;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CommentPolicy
 {

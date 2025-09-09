@@ -21,13 +21,13 @@ class PostFactory extends Factory
 
         // Derive slug from title and add a short unique suffix to avoid DB unique collisions
         $baseSlug = Str::slug($title);
-        $slug = $baseSlug . '-' . $this->faker->unique()->numerify('####');
+        $slug = $baseSlug.'-'.$this->faker->unique()->numerify('####');
 
         return [
             'user_id' => User::factory(),
-            'title'   => $title,
-            'slug'    => $slug,
-            'body'    => $this->faker->paragraphs(3, true),
+            'title' => $title,
+            'slug' => $slug,
+            'body' => $this->faker->paragraphs(3, true),
         ];
     }
 }

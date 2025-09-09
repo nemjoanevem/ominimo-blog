@@ -15,7 +15,7 @@ class PostSeeder extends Seeder
 
         Post::factory()
             ->count(20)
-            ->state(fn() => ['user_id' => $users[array_rand($users)]])
+            ->state(fn () => ['user_id' => $users[array_rand($users)]])
             ->create();
     }
 }

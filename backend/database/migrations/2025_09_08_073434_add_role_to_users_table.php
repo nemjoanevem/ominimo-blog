@@ -1,12 +1,13 @@
 <?php
 
+use App\Enums\Role;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use App\Enums\Role;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
@@ -21,7 +22,7 @@ return new class extends Migration {
     public function down(): void
     {
         // Drop constraint first, then column
-        DB::statement("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check");
+        DB::statement('ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check');
 
         Schema::table('users', function (Blueprint $table) {
             $table->dropIndex(['role']);

@@ -17,7 +17,7 @@ class CommentSeeder extends Seeder
 
         Comment::factory()
             ->count(50)
-            ->state(fn() => [
+            ->state(fn () => [
                 'post_id' => $posts[array_rand($posts)],
                 'user_id' => $users[array_rand($users)],
             ])

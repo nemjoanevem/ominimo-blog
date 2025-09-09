@@ -1,13 +1,13 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\CommentController;
 
 // --- Public endpoints ---
 Route::post('/register', [RegisteredUserController::class, 'store']);
@@ -27,12 +27,12 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
-    
+
     Route::post('/posts', [PostController::class, 'store'])->middleware('throttle:post-writes');
     Route::put('/posts/{post}', [PostController::class, 'update']);
     Route::delete('/posts/{post}', [PostController::class, 'destroy']);
 
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
-    
+
     Route::get('/admin/ping', fn () => ['ok' => true])->middleware('role:admin');
 });

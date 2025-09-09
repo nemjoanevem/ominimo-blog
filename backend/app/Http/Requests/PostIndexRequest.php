@@ -6,7 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PostIndexRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     protected function prepareForValidation(): void
     {
@@ -20,8 +23,8 @@ class PostIndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'page' => ['integer','min:1'],
-            'per_page' => ['integer','in:5,10,20,50'],
+            'page' => ['integer', 'min:1'],
+            'per_page' => ['integer', 'in:5,10,20,50'],
         ];
     }
 

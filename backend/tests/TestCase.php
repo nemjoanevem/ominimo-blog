@@ -13,7 +13,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        if (!app()->environment('testing')) {
+        if (! app()->environment('testing')) {
             throw new \RuntimeException('Tests must run in testing environment.');
         }
 

@@ -25,9 +25,9 @@ class PostApiTest extends TestCase
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id','title','slug','body','description','user' => ['id','name','email']],
+                    '*' => ['id', 'title', 'slug', 'body', 'description', 'user' => ['id', 'name', 'email']],
                 ],
-                'current_page','last_page','per_page','total'
+                'current_page', 'last_page', 'per_page', 'total',
             ]);
         $first = $response->json('data.0');
         $this->assertNotEmpty($first['description']);

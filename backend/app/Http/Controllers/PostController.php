@@ -18,7 +18,7 @@ class PostController extends Controller
     public function index(PostIndexRequest $request): JsonResponse
     {
         return response()->json(
-            $this->service->paginateWithDescription((int)$request->integer('per_page', 10))
+            $this->service->paginateWithDescription((int) $request->integer('per_page', 10))
         );
     }
 
