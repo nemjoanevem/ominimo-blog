@@ -49,6 +49,17 @@
           </li>
         </ul>
 
+        <!-- Pagination -->
+        <div class="flex gap-2 mt-6 justify-center">
+          <button class="px-3 py-1 border rounded-lg"
+                  :disabled="page<=1"
+                  @click="goto(page-1)">&laquo;</button>
+          <span class="px-3 py-1">{{ page }} / {{ lastPage }}</span>
+          <button class="px-3 py-1 border rounded-lg"
+                  :disabled="page>=lastPage"
+                  @click="goto(page+1)">&raquo;</button>
+        </div>
+
         <div class="mt-4">
           <form @submit.prevent="onAddComment" class="space-y-2">
             <div v-if="!auth.isAuthenticated" class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -182,10 +193,9 @@ async function onAddComment() {
   }
 }
 
-async function onDelete() {
-  if (!confirm('Are you sure you want to delete this post?')) return
-  await deletePost(id)
-  router.push({ name: 'PostList' })
+function goto(p: number) {
+  page.value = p
+  loadComments()
 }
 
 async function onDeleteComment(commentId: number) {
