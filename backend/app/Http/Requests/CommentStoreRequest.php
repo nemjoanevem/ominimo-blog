@@ -10,13 +10,20 @@ class CommentStoreRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        // alias "comment" -> body
-        $body = $this->filled('comment') ? (string)$this->input('comment') : (string)$this->input('body');
-        $name = $this->filled('guest_name') ? trim((string)$this->input('guest_name')) : null;
-        $email= $this->filled('guest_email') ? trim((string)$this->input('guest_email')) : null;
+
+        $body = $this->filled('body') ? trim((string)$this->input('body')) : '';
+
+        if ($this->authUser()) {
+            $name = null;
+            $email = null;
+        }
+        else {
+            $name = $this->filled('guest_name') ? trim((string)$this->input('guest_name')) : null;
+            $email= $this->filled('guest_email') ? trim((string)$this->input('guest_email')) : null;
+        }
 
         $this->merge([
-            'body' => trim($body),
+            'body' => $body,
             'guest_name'  => $name,
             'guest_email' => $email,
         ]);
@@ -24,7 +31,7 @@ class CommentStoreRequest extends FormRequest
 
     public function rules(): array
     {
-        $auth = $this->user();
+        $auth = $this->authUser();
 
         $rules = [
             'body' => ['required','string','min:1'],
@@ -49,5 +56,10 @@ class CommentStoreRequest extends FormRequest
             'guest_email.required' => __('messages.validation.guest_email_required'),
             'guest_email.email'    => __('messages.validation.guest_email_email'),
         ];
+    }
+
+    public function authUser()
+    {
+        return $this->user('sanctum') ?? $this->user();
     }
 }

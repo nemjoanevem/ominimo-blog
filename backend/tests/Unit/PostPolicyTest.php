@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-use App\Enums\Role;
 use App\Models\Post;
 use App\Models\User;
 use App\Policies\PostPolicy;
@@ -19,7 +18,7 @@ class PostPolicyTest extends TestCase
 
         $owner = User::factory()->create();
         $other = User::factory()->create();
-        $admin = User::factory()->create(['role' => Role::ADMIN->value]);
+        $admin = User::factory()->admin()->create();
 
         $post = Post::factory()->for($owner)->create();
 

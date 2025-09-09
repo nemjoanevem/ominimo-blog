@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\Role;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -88,7 +87,7 @@ class PostApiTest extends TestCase
     public function test_it_allows_admin_to_update_any_post(): void
     {
         $owner = User::factory()->create();
-        $admin = User::factory()->create(['role' => Role::ADMIN->value]);
+        $admin = User::factory()->admin()->create();
         $post = Post::factory()->for($owner)->create();
 
         Sanctum::actingAs($admin);
@@ -102,7 +101,7 @@ class PostApiTest extends TestCase
     {
         $owner = User::factory()->create();
         $stranger = User::factory()->create();
-        $admin = User::factory()->create(['role' => Role::ADMIN->value]);
+        $admin = User::factory()->admin()->create();
         $post = Post::factory()->for($owner)->create();
 
         // Stranger forbidden
