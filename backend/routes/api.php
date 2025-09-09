@@ -19,7 +19,7 @@ Route::get('/posts', [PostController::class, 'index']);
 Route::get('/posts/{post}', [PostController::class, 'show'])->whereNumber('post');
 
 Route::get('/posts/{postId}/comments', [CommentController::class, 'index'])->whereNumber('postId');
-Route::post('/posts/{postId}/comments', [CommentController::class, 'store'])->whereNumber('postId');
+Route::post('/posts/{postId}/comments', [CommentController::class, 'store'])->whereNumber('postId')->middleware('throttle:comments');
 
 // --- Protected endpoints (require Bearer token) ---
 Route::middleware('auth:sanctum')->group(function () {
@@ -28,7 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
     
-    Route::post('/posts', [PostController::class, 'store']);
+    Route::post('/posts', [PostController::class, 'store'])->middleware('throttle:post-writes');
     Route::put('/posts/{post}', [PostController::class, 'update']);
     Route::delete('/posts/{post}', [PostController::class, 'destroy']);
 
